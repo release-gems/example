@@ -1,0 +1,9 @@
+hooks:
+  prebuild: echo ">> global prebuild"
+  postbuild: echo ">> global prebuild"
+gems:
+  - directory: example1
+    hooks:
+      prebuild: echo ">> example1 prebuild"
+      postbuild: echo ">> example1 prebuild"
+  - directory: example2

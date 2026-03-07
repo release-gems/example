@@ -1,0 +1,52 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby:
+          - '4.0'
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Generate
+      run: bundle exec rake generate
+    - name: Run tests
+      run: bundle exec rake spec
+
+  build:
+    needs: [test]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ruby
+    - uses: release-gems/action/build@master # TODO: replace "master" with HASH
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build]
+    environment: rubygems.org
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+    - uses: release-gems/action@master # TODO: replace "master" with HASH
