@@ -16,9 +16,9 @@ jobs:
         ruby:
           - '4.0'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
     - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
+      uses: ruby/setup-ruby@dffb23f65a78bba8db45d387d5ea1bbd6be3ef18 # v1.293.0
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
@@ -32,11 +32,18 @@ jobs:
       id-token: write
       attestations: write
     steps:
-    - uses: actions/checkout@v4
-    - uses: ruby/setup-ruby@v1
+    - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+    - uses: ruby/setup-ruby@dffb23f65a78bba8db45d387d5ea1bbd6be3ef18 # v1.293.0
       with:
         ruby-version: ruby
+    - uses: anchore/sbom-action@57aae528053a48a3f6235f2d9461b05fbcb7366d # v0.23.1
+      with:
+        output-file: /tmp/sbom.json
+        upload-artifact: false
+        upload-release-assets: false
     - uses: release-gems/action/build@master # TODO: replace "master" with HASH
+      with:
+        sbom: /tmp/sbom.json
 
   publish:
     if: startsWith(github.ref, 'refs/tags/')
